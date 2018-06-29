@@ -43,7 +43,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
     this.options = opts;
   }
 
-  _handleFile = (req, file, cb) => {
+  _handleFile(req, file, cb) {
     debug('_handleFile()', file);
     this.getDestination(req, file, (err, destination) => {
       if (err) {
@@ -80,7 +80,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
       });
     });
   };
-  _removeFile = (req, file, cb) => {
+  _removeFile(req, file, cb) {
     debug('_removeFile()');
     const gcFile = this.gcsBucket.file(file.filename);
     gcFile.delete();
