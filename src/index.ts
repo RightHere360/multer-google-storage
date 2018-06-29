@@ -4,8 +4,17 @@ import _debug from 'debug';
 import { Storage, Bucket, ConfigurationObject } from '@google-cloud/storage';
 import * as uuid from 'uuid/v1';
 
-const storage: (options?: ConfigurationObject) => Storage = require('@google-cloud/storage');
+const storage = require('@google-cloud/storage');
+// const storage: (options?: ConfigurationObject) => Storage = require('@google-cloud/storage');
 const debug = _debug('multergcs');
+
+const getFilename = (req, file, cb) => {
+  cb(null, `${uuid()}_${file.originalname}`);
+};
+
+const getDestination = (req, file, cb) => {
+  cb(null, '');
+};
 
 //
 //
@@ -14,16 +23,11 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
   private gcsBucket: Bucket;
   private options: ConfigurationObject & { acl?: string; bucket?: string };
 
-  getFilename(req, file, cb) {
-    cb(null, `${uuid()}_${file.originalname}`);
-  }
-  getDestination(req, file, cb) {
-    cb(null, '');
-  }
+  private getFilename: Function;
 
   constructor(opts?: ConfigurationObject & { filename?: any; bucket?: string }) {
     opts = opts || {};
-    this.getFilename = opts.filename || this.getFilename;
+    this.getFilename = opts.filename || getFilename;
     opts.bucket = opts.bucket || null;
     opts.credentials = opts.credentials || null;
 
@@ -35,7 +39,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
       throw new Error('You have to specify credentials for Google Cloud Storage to work.');
     }
 
-    this.gcobj = storage({
+    this.gcobj = new storage({
       credentials: opts.credentials,
       promise: Promise,
     });
@@ -45,7 +49,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
 
   _handleFile(req, file, cb) {
     debug('_handleFile()', file);
-    this.getDestination(req, file, (err, destination) => {
+    getDestination(req, file, (err, destination) => {
       if (err) {
         debug('_handleFile() > getDestination > error', err);
         return cb(err);
