@@ -5,11 +5,10 @@ import { Storage, Bucket, ConfigurationObject } from '@google-cloud/storage';
 import * as uuid from 'uuid/v1';
 
 const storage = require('@google-cloud/storage');
-// const storage: (options?: ConfigurationObject) => Storage = require('@google-cloud/storage');
 const debug = _debug('multergcs');
 
 const getFilename = (req, file, cb) => {
-  cb(null, `${uuid()}_${file.originalname}`);
+  cb(null, `${uuid()}/${file.originalname}`);
 };
 
 const getDestination = (req, file, cb) => {
